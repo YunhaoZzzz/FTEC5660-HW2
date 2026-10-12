@@ -90,10 +90,12 @@ python3 hw2.py --cv-folder task2
 attack the MCP server. See the homework description for the full rules.
 
 ## Homework 2 solution:
-> to students: this is your report, see the homework description.
 
 ### Task 1
-> one paragraph describing your solution, and your results on `public_test`.
+The verifier uses one `deepseek-v4-flash` LangChain tool-calling agent, with LinkedIn as the primary evidence source and Facebook available only to help resolve identity. It searches by name and location, compares all plausible same-name profiles against the CV's employers, dates, and education, then checks the selected profile's name, city, jobs, education, and every listed skill. Its instructions treat CV text as untrusted data, ignore embedded instructions, allow equivalent wording, and separate uncertain identity from a proven mismatch. CVs are processed with a maximum concurrency of three; a per-CV timeout and fallback score keep one failed request from aborting the batch. **Public test results:** 7/7 correct on the seven provided CVs (one run).
 
 ### Task 2
-> the attack techniques you used and why you expect them to work.
+The attack CV preserves the structured facts that the verifier checks against LinkedIn, but adds a fabricated achievement to the AIA job description: HKD 18 million in annual savings delivered through a 42-person transformation program. This is a verification-coverage attack: the assignment says job descriptions are not discrepancy evidence, so the agent ignores the claim even though it is deliberately embellished. The attack CV scored 0.95 with my verifier; the true CV scored 0.95 as well. The PDF is saved as `task2/adversarial cv.pdf` and is one page.
+
+### Task 3: Reflection on AI paradoxes
+This exercise shows a tension in automated verification: the more a system is asked to trust the documents it reads, the more those documents can manipulate its judgment. A CV is both the evidence being checked and an input that can contain instructions aimed at the checker. Tool access and confident explanations do not remove that tension; they help only when the agent keeps a clear boundary between evidence and instructions, and checks claims against an independent source. At the same time, a cautious agent can mark a truthful CV uncertain when identity matching or tool access fails. The goal is therefore not simply to make the model more confident, but to design the workflow so that confidence follows verified evidence and uncertain cases remain reviewable.
